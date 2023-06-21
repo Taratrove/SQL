@@ -1,0 +1,98 @@
+câu 1:
+go
+select nv.TENNV, da.TENDA
+from NhanVien nv
+join Dean da
+on nv.TENNV = da.TENDA
+go
+câu 2:
+create view NV_DA AS
+SELECT TENNV,TENDA 
+from NhanVien, Dean
+select * from NV_DA;
+câu 4:
+update NV_DA
+set TENDA = N'Quản lý các dự án CNTT thông tin'
+where TENDA=N'Resort nghỉ dưỡng';
+
+câu lệnh thực hiện được vì nó thoả mãn với các điều kiện để update view
+câu 5:
+go
+	select nv.TENNV,nv.LUONG,nv.SOGIO, da.TENDA
+	from NhanVien nv
+	join Dean da
+	on nv.TENNV = da.TENDA
+	where (LUONG*SOGIO) as 'tl'
+	order by tl
+go
+	create view View5a AS
+	SELECT TENNV,TENDA,LUONG,sogio,tl 
+	from NhanVien, Dean
+a) ko thực hiện được vì ko có bảng SOGIO 
+b)
+alter table NhanVien
+	ADD SOGIO numeric(18,0)
+
+go
+
+go
+	select nv.TENNV,nv.LUONG,nv.SOGIO, da.TENDA
+	from NhanVien nv
+	join Dean da
+	on nv.TENNV = da.TENDA
+	where (LUONG*SOGIO) like 'tl'
+go
+	create view View5a AS
+	SELECT TENNV,TENDA,LUONG,sogio 
+	from NhanVien, Dean
+câu 6:
+	create view View6 AS
+	SELECT * FROM Dean
+	where DDIEM_DA like N'Tp.HCM'
+a)
+	create view View6a AS
+	SELECT * FROM Dean
+	where DDIEM_DA like N'Tp.HCM'
+	with ENCRYTION;
+b) để tạo view được lập chỉ mục, đầu tiên tạo view với tuỳ chọn with SCHEMABINDING
+để kiên kết view với lược đồ của các bảng, sau đó toạ 1 unique clustered index cho view
+vì với tuỳ chọn này, buộc phải xoá view được lập chỉ mục trước khi thay cấu trúc của bảng ảnh hưởng
+
+	create view View6b 
+	with schemabinding
+	AS
+	SELECT * FROM Dean
+	where DDIEM_DA like N'Tp.HCM'
+c) 
+	create view View6c 
+	AS
+	SELECT * FROM Dean
+	where DDIEM_DA like N'Tp.HCM'
+	with check option;
+	Insert view6c
+	VALUES(‘99’,’Xây dựng đường cao tốc LT-DN’, ‘Đồng Nai’,’5’)
+thêm được vì thêm dữ liệu mà nó khác null là được không thì sẽ lỗi
+d)DELETE FROM Dean WHERE MADA = 99
+câu 7:
+CREATE TABLE DEAN_HCM(
+	MaDA varchar(2) not null Primary key,
+	TenDA nvarchar(50) null,
+	DDIEM_DA varchar(20) null,
+	PHONG varchar(2) null,
+	CONSTRAINT DEAN CHECK(DDIEM_DA='Tp.Hồ Chí Minh')
+);
+CREATE TABLE DEAN_HANOI(
+	MaDA varchar(2) not null Primary key,
+	TenDA nvarchar(50) null,
+	DDIEM_DA varchar(20) null,
+	PHONG varchar(2) null,
+	CONSTRAINT DEAN CHECK(DDIEM_DA='Hà Nội')
+);
+CREATE TABLE DEAN_VT(
+	MaDA varchar(2) not null Primary key,
+	TenDA nvarchar(50) null,
+	DDIEM_DA varchar(20) null,
+	PHONG varchar(2) null,
+	CONSTRAINT DEAN CHECK(DDIEM_DA='Vũng Tàu')
+);
+

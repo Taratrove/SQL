@@ -1,0 +1,540 @@
+-- QLDA
+
+CREATE DATABASE QLDA
+GO
+USE QLDA
+GO
+
+-- CREATE TABLES
+CREATE TABLE DEAN
+(
+	MADA VARCHAR(2) NOT NULL,
+	TENDA NVARCHAR(50),
+	DDIEM_DA NVARCHAR(20),
+	PHONG VARCHAR(2),
+	
+	PRIMARY KEY (MADA)
+)
+
+CREATE TABLE PHONGBAN
+(
+	MAPHG VARCHAR(2) NOT NULL,
+	TENPHG NVARCHAR(15),
+	TRPHG NVARCHAR(9),
+	NG_NHANCHUC DATE,
+	
+	PRIMARY KEY (MAPHG)
+)
+
+CREATE TABLE DIADIEM_PHG
+(
+	MAPHG VARCHAR(2) NOT NULL,
+	DIADIEM NVARCHAR(20) NOT NULL,
+	
+	PRIMARY KEY (MAPHG, DIADIEM)
+)
+
+CREATE TABLE NHANVIEN
+(
+	MANV NVARCHAR(9) NOT NULL,
+	HONV NVARCHAR(15),
+	TENLOT NVARCHAR(15),
+	TENNV NVARCHAR(15),
+	NGSINH DATE,
+	DCHI NVARCHAR(30),
+	PHAI NVARCHAR(3),
+	LUONG FLOAT,
+	MA_NQL NVARCHAR(9),
+	PHG VARCHAR(2),
+	
+	PRIMARY KEY (MANV)
+)
+
+CREATE TABLE THANNHAN
+(
+	MA_NVIEN NVARCHAR(9) NOT NULL,
+	TENTN NVARCHAR(15) NOT NULL,
+	NGSINH DATE,
+	PHAI NVARCHAR(3),
+	QUANHE NVARCHAR(15),
+	
+	PRIMARY KEY (MA_NVIEN, TENTN)
+)
+
+CREATE TABLE PHANCONG
+(
+	MA_NVIEN NVARCHAR(9) NOT NULL,
+	SODA VARCHAR(2) NOT NULL,
+	THOIGIAN NUMERIC(18,0),
+	
+	PRIMARY KEY (MA_NVIEN, SODA)
+)
+
+-- Cài đặt ràng buộc khóa ngoại cho các bảng 
+ALTER TABLE DEAN
+ADD CONSTRAINT FK_DEAN_PHONG
+FOREIGN KEY (PHONG)
+REFERENCES PHONGBAN (MAPHG)
+
+ALTER TABLE PHONGBAN
+ADD CONSTRAINT FK_PHONGBAN_NHANVIEN
+FOREIGN KEY (TRPHG)
+REFERENCES NHANVIEN (MANV)
+
+ALTER TABLE DIADIEM_PHG
+ADD CONSTRAINT FK_DIADIEM_PHG_PHONGBAN
+FOREIGN KEY (MAPHG)
+REFERENCES PHONGBAN (MAPHG)
+
+ALTER TABLE NHANVIEN
+ADD CONSTRAINT FK_NHANVIEN_PHONGBAN
+FOREIGN KEY (PHG)
+REFERENCES PHONGBAN (MAPHG)
+
+ALTER TABLE NHANVIEN
+ADD CONSTRAINT FK_NHANVIEN_NHANVIEN
+FOREIGN KEY (MA_NQL)
+REFERENCES NHANVIEN (MANV)
+
+ALTER TABLE PHANCONG
+ADD CONSTRAINT FK_PHANCONG_DEAN
+FOREIGN KEY (SODA)
+REFERENCES DEAN (MADA)
+
+ALTER TABLE PHANCONG
+ADD CONSTRAINT FK_PHANCONG_NHANVIEN
+FOREIGN KEY (MA_NVIEN)
+REFERENCES NHANVIEN (MANV)
+
+ALTER TABLE THANNHAN
+ADD CONSTRAINT FK_THANNHAN_NHANVIEN
+FOREIGN KEY (MA_NVIEN)
+REFERENCES NHANVIEN (MANV)
+
+BEGIN /** NHANVIEN **/
+	ALTER TABLE NHANVIEN
+	NOCHECK CONSTRAINT ALL
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Đinh', N'Bá', N'Tiến', '009', '02/11/1960', N'119, Cống Quỳnh, TP.HCM', N'Nam', 30000, '005', 5)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Nguyễn', N'Thanh', N'Tùng', '005', '08/20/1962', N'222, Nguyễn Văn Cừ, TP.HCM', N'Nam', 40000, '006', 5)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Bùi', N'Ngọc', N'Hằng', '007', '03/11/1954', N'332, Nguyễn Thái Học, TP.HCM', N'Nam', 25000, '001', 4)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Lê', N'Quỳnh', N'Như', '001', '02/01/1967', N'291, Hồ Văn Huê, TP.HCM', N'Nữ', 43000, '006', 4)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Nguyễn', N'Mạnh', N'Hùng', '004', '03/04/1967', N'95, Bà Rịa - Vũng Tàu', N'Nam', 38000, '005', 5)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Trần', N'Thanh', N'Tâm', '003', '05/04/1957', N'34, Mai Thị Lự, TP.HCM', N'Nam', 25000, '005', 5)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, MA_NQL, PHG)
+	VALUES (N'Trần', N'Hồng', N'Quang', '008', '09/01/1967', N'45, Lê Hồng Phong, TP.HCM', N'Nam', 25000, '001', 4)
+	INSERT INTO NHANVIEN (HONV, TENLOT, TENNV, MANV, NGSINH, DCHI, PHAI, LUONG, PHG)
+	VALUES (N'Phạm', N'Văn', N'Vinh', '006', '01/01/1965', N'45, Trưng Vương', N'Nữ', 55000, 1)
+	ALTER TABLE NHANVIEN
+	CHECK CONSTRAINT ALL
+END
+
+BEGIN /** PHONGBAN **/
+	ALTER TABLE PHONGBAN
+	NOCHECK CONSTRAINT ALL
+	INSERT INTO PHONGBAN (TENPHG, MAPHG, TRPHG, NG_NHANCHUC)
+	VALUES (N'Nghiên cứu', 5, '005', '05/22/1978')
+	INSERT INTO PHONGBAN (TENPHG, MAPHG, TRPHG, NG_NHANCHUC)
+	VALUES (N'Điều hành', 4, '008', '01/01/1985')
+	INSERT INTO PHONGBAN (TENPHG, MAPHG, TRPHG, NG_NHANCHUC)
+	VALUES (N'Quản lý', 1, '006', '06/19/1971')
+	ALTER TABLE PHONGBAN
+	CHECK CONSTRAINT ALL
+END
+
+BEGIN /** DEAN **/
+	ALTER TABLE DEAN
+	NOCHECK CONSTRAINT ALL
+	INSERT INTO DEAN (TENDA, MADA, DDIEM_DA, PHONG)
+	VALUES (N'Sản phẩm X', 1, N'Vũng Tàu', 5)
+	INSERT INTO DEAN (TENDA, MADA, DDIEM_DA, PHONG)
+	VALUES (N'Sản phẩm Y', 2, N'Nha Trang', 5)
+	INSERT INTO DEAN (TENDA, MADA, DDIEM_DA, PHONG)
+	VALUES (N'Sản phẩm Z', 3, N'TP.HCM', 5)
+	INSERT INTO DEAN (TENDA, MADA, DDIEM_DA, PHONG)
+	VALUES (N'Tin học hóa', 10, N'Hà Nội', 4)
+	INSERT INTO DEAN (TENDA, MADA, DDIEM_DA, PHONG)
+	VALUES (N'Cáp quang', 20, N'TP.HCM', 1)
+	INSERT INTO DEAN (TENDA, MADA, DDIEM_DA, PHONG)
+	VALUES (N'Đào tạo', 30, N'Hà Nội', 4)
+	ALTER TABLE DEAN
+	CHECK CONSTRAINT ALL
+END
+
+BEGIN /** THANNHAN **/
+	ALTER TABLE THANNHAN
+	NOCHECK CONSTRAINT ALL
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('005', N'Trinh', N'Nữ', '04/05/1976', N'Con gái')
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('005', N'Khang', N'Nam', '10/25/1973', N'Con trai')
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('005', N'Phương', N'Nữ', '05/03/1948', N'Vợ chồng')
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('001', N'Minh', N'Nam', '02/29/1932', N'Vợ chồng')
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('009', N'Tiến', N'Nam', '01/01/1978', N'Con trai')
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('009', N'Châu', N'Nữ', '12/30/1978', N'Con gái')
+	INSERT INTO THANNHAN (MA_NVIEN, TENTN, PHAI, NGSINH, QUANHE)
+	VALUES ('009', N'Phương', N'Nữ', '05/05/1957', N'Vợ chồng')
+	ALTER TABLE THANNHAN
+	CHECK CONSTRAINT ALL
+END
+
+BEGIN /** DIADIEM_PHG **/
+	ALTER TABLE DIADIEM_PHG
+	NOCHECK CONSTRAINT ALL
+	INSERT INTO DIADIEM_PHG (MAPHG, DIADIEM)
+	VALUES (1, N'TP.HCM')
+	INSERT INTO DIADIEM_PHG (MAPHG, DIADIEM)
+	VALUES (4, N'Hà Nội')
+	INSERT INTO DIADIEM_PHG (MAPHG, DIADIEM)
+	VALUES (5, N'Vũng Tàu')
+	INSERT INTO DIADIEM_PHG (MAPHG, DIADIEM)
+	VALUES (5, N'Nha Trang')
+	INSERT INTO DIADIEM_PHG (MAPHG, DIADIEM)
+	VALUES (5, N'TP.HCM')
+	ALTER TABLE DIADIEM_PHG
+	CHECK CONSTRAINT ALL
+END
+
+BEGIN /** PHANCONG **/
+	ALTER TABLE PHANCONG
+	NOCHECK CONSTRAINT ALL
+	INSERT INTO PHANCONG (MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('009', '1', 32)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('009', '2', 8)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('004', '3', 40)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('003', '1', 20.0)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('003', '2', 20.0)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('008', '10', 35)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('008', '30', 5)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('001', '30', 20)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('001', '20', 15)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('006', '20', 30)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('005', '3', 10)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('005', '10', 10)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('005', '20', 10)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('007', '30', 30)
+	INSERT INTO PHANCONG(MA_NVIEN, SODA, THOIGIAN)
+	VALUES ('007', '10', 10)
+	ALTER TABLE PHANCONG
+	CHECK CONSTRAINT ALL
+END
+
+
+
+--Đề 2
+
+CREATE DATABASE QLTV 
+GO
+USE QLTV
+GO
+
+
+
+----------------------------------SQL
+
+create table Docgia
+(
+	MaDG varchar(10) not null primary key,
+	Holot nvarchar(20) null,
+	Ten nvarchar(8) null,
+	GioiTinh nvarchar(5) null,
+	DiaChi nvarchar(40) null,
+	NgaySinh smalldatetime null,
+	STD int null,
+	Email nvarchar(40) null,
+);
+create table Sach
+(
+	MaSach varchar(10) not null primary key,
+	TenSach nvarchar(50) null,
+	TacGia nvarchar(30) null,
+	TheLoai nvarchar(20) null,
+	ThoiGian int null,
+);
+create table PhieuMuon
+(
+	MaDG varchar(10) not null,
+	MaSach varchar(10) not null,
+	NgayMuon date not null,
+	NgayTra date null,
+	primary key (MaDG,MaSach,NgayMuon),
+);
+
+set DATEFORMAT dmy
+GO
+
+insert into DocGia
+	values ('DG001','Nguyễn Tiến',N'Dũng','Nam','Hải Dương','31/10/2002','0395726180','dung.nt.62cntt@ntu.edu.vn'),
+	       ('DG002','Nguyễn Văn','An','Nam','Khánh Hoà','12/1/2000','055791389','avt@gmail.com'),
+            ('DG003','Trần Thị','Bính','Nam', 'Khánh Hoà','24/5/1999','034682786','binh@gmail.com')
+
+insert into Sach
+	values ('TT101','mắt biếc','Nguyễn Nhật Ánh','truyện ngắn','10'),
+		('TN160','Doraemon','Fujiko F Fujio','truyện thiếu nhi','20'),
+		('TH120','high school of dxd','dd','manga nhật bản','30')
+
+insert into PhieuMuon
+values ('DG001','TT101','23/10/2020','28/10/2020'),
+	   ('DG002','TN160','12/5/2021','22/5/2021'),
+	   ('DG003','TH110','16/7/2022','22/3/2022')
+
+insert into DocGia
+VALUES
+    ('DG004','Trần Thị','Bính','Nam', 'Khánh Hoà','24/5/1999','034682786','binh@gmail.com')
+insert into PhieuMuon
+values ('DG003','TN160','16/7/2022','22/3/2022')
+
+insert into PhieuMuon
+values ('DG004','TH110','16/7/2022','22/3/2022')
+
+SELECT * FROM DOCGIA
+SELECT * FROM SACH
+SELECT * FROM PHIEUMUON
+--------------------------------------------- T-SQL
+
+-- Biến
+
+DECLARE @masach nvarchar(5) -- Sửa tên biến
+, @tensach nvarchar(20)
+, @tacgia nvarchar(20)
+, @theloai nvarchar(20)
+, @thoigian int
+
+SELECT TOP 1 @masach = s.MaSach, -- Sửa tên cột lấy dữ liệu tên biến
+        @tensach = Tensach,
+        @tacgia = Tacgia,
+        @theloai = Theloai,
+        @thoigian = Thoigian
+FROM Sach s
+JOIN PhieuMuon pm
+ON s.MaSach = pm. MaSach
+GROUP BY s.MaSach, Tensach, Tacgia, Theloai, Thoigian
+ORDER BY COUNT(s.MaSach) DESC
+
+Print N'Sách được đọc nhiều nhất'; -- sửa tên biến, nếu dữ liệu mà khác kiểu nvarchar
+-- ví dụ thời gian int : convert(varchar(30), @thoigian)
+Print N'Mã Sách: '+ @masach;
+Print N'Tên Sách: '+ @tensach;
+Print N'Tác Giả: '+ @tacgia;
+Print N'Thể loại: '+ CONVERT(varchar (20),@theloai);
+Print N'Thời gian: '+ CONVERT(varchar (5),@thoigian) + ' ngày';
+
+-------------------------------------------------
+
+-- Con trỏ
+
+use QLTV
+GO
+
+DECLARE @hoten nvarchar(30) -- sửa tên biến
+, @ngaysinh date
+, @email varchar(40)
+, @tensach nvarchar(20)
+, @ngaymuon date
+
+DECLARE curr CURSOR FAST_FORWARD READ_ONLY FOR
+    SELECT Holot + ' ' + Ten
+    , Ngaysinh
+    , Email
+    , Tensach
+    , Ngaymuon  -- sửa tên cột
+    FROM Docgia dg
+    JOIN Phieumuon pm
+    ON dg.MaDG = pm.MaDG
+    JOIN Sach s
+    ON pm.MaSach = s.MaSach
+    WHERE s.MaSach = 'TT101'
+OPEN curr
+
+FETCH NEXT FROM curr INTO @hoten, @ngaysinh, @email, @tensach, @ngaymuon -- sửa tên biến
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    Print ('====================');
+    Print (N'Họ Tên: '+ @hoten);                                     -- sửa tên biến, tiếp tục xài combo convert
+    Print (N'Ngày sinh: '+ CONVERT(varchar(30), @ngaysinh, 103));
+    Print (N'Email: '+ @email);
+    Print (N'Tên sách: '+ @tensach);
+    Print (N'Ngày mượn: '+ CONVERT(varchar(30), @ngaymuon, 103)); 
+    FETCH NEXT FROM curr INTO @hoten, @ngaysinh, @email, @tensach, @ngaymuon
+END
+
+CLOSE curr
+DEALLOCATE curr
+
+-- Câu 6 
+-- STORE PROCEDURE
+-- Thủ tục hiển thị thông tin đề án với MADA được truyền vào
+
+GO
+CREATE PROC sp_HIENTHITHONGTIN( -- sửa tên thủ tục
+@mada varchar(2) -- sửa tham số truyền vào
+)
+AS BEGIN
+  	SELECT MADA, TENDA, DDIEM_DA, PHONG -- sửa tên biến, sửa tên cột
+	FROM DEAN
+	WHERE MADA = @mada
+END
+GO
+
+EXEC sp_HIENTHITHONGTIN 20 -- sửa tên thủ tục
+GO
+-- Hàm
+-- FUNCTION
+
+-- Viết hàm trả về tổng tiền lương trung bình của một phòng ban tùy ý (truyền vào MaPB
+
+
+-- Tìm ngày sinh của nhân viên có mã số được truyền vào
+use QLDA
+GO
+
+CREATE FUNCTION fn_timngaysinh(@manv varchar(3)) -- sửa tên hàm ( sửa tên biến truyền vào + kiểu dữ liệu )
+RETURNS DATE -- sửa kiểu dữ liệu đầu ra
+AS BEGIN
+	DECLARE @ngaysinh date -- sửa biến output
+
+	SELECT @ngaysinh = NGSINH -- sửa tên biến + tên cột
+	FROM NHANVIEN nv
+	WHERE MANV = @manv
+
+	RETURN @ngaysinh -- sửa tên biến output
+END
+GO
+
+declare @output date
+select @output = dbo.fn_timngaysinh('001') from NHANVIEN
+print 'Ngày sinh: ' + convert(varchar(30),@output,103);  -- combo convert(varchar(30),@output,103)
+GO
+
+select TENNV, dbo.fn_timngaysinh(MANV) from NHANVIEN
+GO
+
+
+-- Check nam thì giảm 10% lương còn nữ tăng 100%, xuất ra lương
+
+ALTER FUNCTION fn_tangluongdieukien(@manv varchar(3)) -- sửa tên hàm ( sửa tên biến truyền vào + kiểu dữ liệu )
+RETURNS MONEY -- sửa kiểu dữ liệu đầu ra
+AS BEGIN
+	DECLARE @luong money -- sửa biến output
+    DECLARE @gt nvarchar(3)
+
+	SELECT @luong = LUONG, @gt = PHAI -- sửa tên biến + tên cột
+	FROM NHANVIEN nv
+	WHERE MANV = @manv
+
+    IF (@gt = N'Nữ') -- Nữ tăng 20%
+    BEGIN
+        SET @luong = @luong + (@luong * 20/100)
+    END
+    ELSE -- Nam, đk: lương trên 25000 tăng lương, còn ngược lại đuổi việc
+    BEGIN
+        IF (@luong > 25000)
+        BEGIN
+            SET @luong = @luong + 5000
+        END
+        ELSE
+        BEGIN
+            SET @luong = @luong - @luong
+        END
+    END
+
+	RETURN @luong -- sửa tên biến output
+END
+GO
+
+SELECT * FROM NHANVIEN WHERE MANV = '001'
+declare @output money
+select @output = dbo.fn_tangluong('001') from NHANVIEN
+print 'Lương sau khi tăng: ' + convert(varchar(30),@output);  -- combo convert(varchar(30),@output,103)
+GO
+
+SELECT TENNV, PHAI, LUONG from NHANVIEN
+
+select TENNV, PHAI, dbo.fn_tangluong(MANV) as TangLuong from NHANVIEN
+GO
+
+SELECT TENNV, PHAI, LUONG from NHANVIEN
+
+select TENNV, PHAI, dbo.fn_tangluongtheoditmenu(MANV) as TangLuong from NHANVIEN
+GO
+
+SELECT TENNV, PHAI, LUONG from NHANVIEN
+
+select TENNV, PHAI, dbo.fn_tangluongdieukien(MANV) as TangLuong,
+(
+    CASE
+        WHEN (dbo.fn_tangluongdieukien(MANV) = 0) THEN N'Cúc'
+        ELSE N'Tuổi loL đuổi được tao'
+    END
+) as NowStatus
+from NHANVIEN
+GO
+
+-- TRIGGER
+
+--INSERT 
+--UPDATE
+--DELETE 
+
+-- Không cho người khác thêm dữ liệu vào và thông báo lỗi 'Không thể chèn dữ liệu'
+CREATE TRIGGER trg_khongchothem ON DEAN -- sửa tên trg
+FOR INSERT
+AS BEGIN                            -- sửa trong cặp ás begin - end
+  IF EXISTS (
+	SELECT * FROM INSERTED
+  )
+  BEGIN
+	PRINT('DIT ME MAY TUOI LOL')
+	ROLLBACK
+  END
+END
+GO
+
+CREATE TRIGGER trg_khongchothem2 ON DEAN
+FOR UPDATE
+AS BEGIN
+  IF EXISTS (
+	SELECT * FROM INSERTED
+  )
+  BEGIN
+	PRINT('DIT ME MAY TUOI LOL')
+	ROLLBACK
+  END
+END
+GO
+
+CREATE TRIGGER trg_khongchothem3 ON THANNHAN
+FOR DELETE
+AS BEGIN
+  IF EXISTS (
+	SELECT * FROM DELETED
+  )
+  BEGIN
+	PRINT('DIT ME MAY TUOI LOL')
+	ROLLBACK
+  END
+END
+GO

@@ -1,0 +1,95 @@
+----------------------------------SQL
+1.
+create table Docgia
+(
+	MaDG varchar(10) not null primary key,
+	Holot nvarchar(20) null,
+	Ten nvarchar(8) null,
+	GioiTinh nvarchar(5) null,
+	DiaChi nvarchar(40) null,
+	NgaySinh smalldatetime null,
+	STD int null,
+	Email nvarchar(40) null,
+);
+create table Sach
+(
+	MaSach varchar(10) not null primary key,
+	TenSach nvarchar(50) null,
+	TacGia nvarchar(30) null,
+	TheLoai nvarchar(20) null,
+	ThoiGian int null,
+);
+create table PhieuMuon
+(
+	MaDG varchar(10) not null,
+	MaSach varchar(10) not null,
+	NgayMuon timesmalldate not null,
+	NgayTra timesmalldate null,
+	primary key (MaDG,MaSach,NgayMuon),
+);
+alter table PhieuMuon
+	add constraint fk_phieumuon_docgia foreign key (MaDG) references DocGia(MaDG),
+		constraint fk_phieumuon1_sach foreign key (MaSach) references Sach(MaSach)
+insert into DocGia
+	values ('DG001','Nguyễn Tiến','Dũng','31/10/2002','Kim Thành - Hải Dương','0395726180','dung.nt.62cntt@ntu.edu.vn'),
+	       ('DG002','Nguyễn Văn','An','12/1/2000','Nha Trang-Khánh Hoà','055791389','avt@gmail.com'),
+               ('DG003','Trần Thị','Bính','24/5/1999','Khánh Hoà','034682786','binh@gmail.com')
+
+insert into Sach
+	values ('TT101','mắt biếc','Nguyễn Nhật Ánh','truyện ngắn','10'),
+		('TN160','Doraemon','Fujiko F Fujio','truyện thiếu nhi','20'),
+		('TH110','high school of dxd','dd','manga nhật bản','30')
+
+insert into PhieuMuon
+values ('DG001','TT101','23/10/2020','28/10/2020'),
+	   ('DG002','TN160','12/5/2021','22/5/2021'),
+	   ('DG003','TH110','16/7/2022','')
+--------------------------------------------- T-SQL
+2.
+declare @tensach varchar(50),@tacgia nvarchar(30),@theloai nvarchar(20)
+select @tensach = TenSach,
+	   @tacgia = TacGia,
+	   @theloai = TheLoai
+from PhieuMuon
+where MaSach = 'TT101';
+print N'Tên sách' + @tensach;
+print N'Tác giả' + @tacgia;
+print N'Thể loại' + @theloai;
+3.
+declare @sach varchar(50), @TG nvarchar(30),@muon time
+select top 1 @sach= s.TenSach,
+	       @TG= s.TacGia,
+		   @muon= pm.NgayMuon
+from Sach s
+join PhieuMuon pm
+on s.MaSach=pm.MaSach
+group by s.TenSach,s.TacGia,pm.NgayMuon
+order by count(date(NgayMuon)) DESC
+print N'cuốn sách được đọc nhiều nhất';
+print N'Tên sách' + @sach;
+print N'Tác giả' +@TG;
+print N'số lượng' + @muon
+
+
+4.
+DECLARE @madg nvarchar(5), @hoten nvarchar(30), @ngaysinh date, @diachi nvarchar(50), @sdt varchar(30), @email  nvarchar(40)
+SELECT TOP 1 @madg = MaDG,
+       @hoten = Holot + ' ' + Ten,
+        @ngaysinh = NgaySinh,
+        @diachi = DiaChi,
+        @sdt = STD
+        @email = Email
+FROM DocGia 
+GROUP BY MaDG, Holot, Ten, NgaySinh, DiaChi, STD, Email
+ORDER BY MIN(DATEDIFF(YEAR, NgaySinh, GetDate())) DESC
+
+Print N'Độc Giả có tuổi nhỏ nhất';
+Print N'Mã DG: '+ @mahv;
+Print N'Họ Tên: '+ @hoten;
+Print N'Ngày Sinh: '+ CONVERT(varchar(30), CONVERT(date,@ngaysinh, 103));
+Print N'Địa Chỉ: '+ @diachi;
+Print N'STD: '+ @sdt;
+Print N'Email: '+ @email
+5.
+declare curr CURSOR 
+select 

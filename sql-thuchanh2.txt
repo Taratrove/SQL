@@ -1,0 +1,98 @@
+câu 1.
+SELECT *FROM NhanVien WHERE PHG = '05'
+câu 3.
+WHERE LUONG > 65000 AND PHG = '01'
+SELECT *FROM NhanVien WHERE LUONG > 70000 AND PHG = '02'
+câu 4.
+SELECT *FROM NhanVien WHERE DCHI = 'TPHCM'
+câu 5.
+select HONV+ ' ' +TENLOT+ ' ' +TENNV as 'Họ Và Tên'
+	from NhanVien 
+	where NhanVien.TENNV like N'N%'
+	select *
+	from NhanVien
+câu 7.
+SELECT *FROM NhanVien WHERE NGSINH BETWEEN '1955' AND '1975'
+câu 9.
+select TENNV,Year(getdate())-Year(NGSINH) as 'Tuổi'
+	from NhanVien
+câu 10.
+select PhongBan.TENPHG,DIADIEM_PHG.DIADIEM
+	from PhongBan,DIADIEM_PHG
+	where PHONGBAN.MAPHG=DIADIEM_PHG.MAPHG
+câu 11.
+select HONV+ ' ' +TENLOT+ ' ' +TENNV as 'Họ Và Tên Trưởng Phòng'
+	from PhongBan,NhanVien
+	where PhongBan.TRPHG=Nhanvien.MANV
+câu 13.
+select TENDA,TENPHG,HONV,TENNV
+	from NhanVien,PhongBan,Dean
+	where NhanVien.MANV = PhongBan.TRPHG and PhongBan.MAPHG = Dean.Phong and DEAN.DDIEM_DA like N'Nha Trang'
+
+	select*
+	from PhongBan
+	select*
+	from Dean
+câu 14.
+select TENNV,TENTN
+	from NhanVien,ThanNhan
+	where NhanVien.MANV = ThanNhan.MA_NVien and NhanVien.PHAI like N'Nữ'
+câu 15.
+select nv.HONV+ ' ' +nv.TENLOT+ ' ' +nv.TENNV as 'Họ Và Tên nv',ql.HONV+ ' ' +ql.TENLOT+ ' ' +ql.TENNV as 'Họ Và Tên Quản Lí'
+	from NhanVien nv
+	join NhanVien ql
+	on ql.MANV = nv.MA_NQL
+	join PhongBan pb
+	on pb.MAPHG = nv.PHG
+	join NhanVien tp
+	on pb.TRPHG = nv.MANV
+câu 16.
+select nv.HONV+ ' ' +nv.TENLOT+ ' ' +nv.TENNV as 'Họ Và Tên nv',ql.HONV+ ' ' +ql.TENLOT+ ' ' +ql.TENNV as 'Họ Và Tên Quản Lí'
+	from NHANVIEN nv,NHANVIEN ql
+	where nv.MA_NQL=ql.MANV
+câu 18.
+select Dean.TENDA
+	from NhanVien,PhanCong,Dean
+	where NhanVien.MANV = PhanCong.MA_NVien and PhanCong.SODA= Dean.MADA and HONV = N'Trần' and TENLOT=N'Anh' and TENNV=N'Tuấn'
+câu 21.
+select avg(LUONG) as 'Lương Trung Bình của các NV nữ'
+	from NhanVien
+	where phai like N'Nữ'
+câu 22.
+select count(*) as 'Số thân nhân của Sang'
+	from NhanVien,ThanNhan
+	where MANV=MA_NVien and HONV = N'Lê' and TENLOT=N'Thanh' and TENNV=N'Sang'
+câu 28.
+select TENPHG,AVG(LUONG)
+	from PhongBan,NhanVien
+	where MAPHG=PHG
+	group by TENPHG
+câu 29.
+select TENPHG,COUNT(*) as 'Số lượng nhân viên làm việc'
+	from PhongBan,NhanVien
+	where MAPHG=PHG
+	group by TENPHG
+	having avg(LUONG)>30000
+câu 32.
+select TENPHG,count(*)
+	from PhongBAn,NhanVien,Dean
+	where MAPHG=PHG and MAPHG=Phong
+	group by TENPHG
+	having AVG(LUONG)>50000
+câu 33.
+select DDIEM_DA,count(*) as 'Số đề án'
+	from Dean
+	group by DDIEM_DA
+
+	--dean
+	select*
+	from Dean
+câu 34.
+select Dean.TENDA,count(TEN_CONG_VIEC) as 'Số lượng CV'
+	from Dean,CONGVIEC
+	where dean.MADA = Phancong.SODA
+	group by Dean.TENDA
+
+	select*
+	from Phancong
+câu 35.

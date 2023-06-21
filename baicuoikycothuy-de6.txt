@@ -1,0 +1,208 @@
+--------------------------Câu 1---------------------------
+
+------------------------------------------------------------a
+
+CREATE DATABASE QLVT 
+GO
+USE QLVT
+GO
+
+set dateformat dmy
+GO
+
+CREATE TABLE Xe
+(
+MaXe varchar(4) NOT NULL PRIMARY KEY
+,BienSoXe varchar(8)
+,HangSanXuat varchar(10)
+,TongSoGhe int
+)
+GO
+
+CREATE TABLE TaiXe
+(
+MaTaiXe varchar(4) NOT NULL PRIMARY KEY
+,HoDemTX nvarchar(20)
+,TenTX varchar(10)
+,NgaySinh date
+)
+GO
+
+CREATE TABLE NoiDen
+(
+  MaNoiDen varchar(2) NOT NULL PRIMARY KEY
+  ,TenNoiDen nvarchar(15)
+  ,SoKm int
+  ,GiaVe money
+)
+GO
+
+CREATE TABLE ChuyenXe
+(
+  Ngay date NOT NULL
+  ,MaXe varchar(4) not null
+  ,MaTaiXe varchar(4) not null
+  ,MaNoiDen varchar(2) not null
+  ,SoVe int not null
+  ,CONSTRAINT pk_ChuyenXe PRIMARY KEY (Ngay, MaXe)
+)
+GO
+
+ALTER TABLE ChuyenXe
+ADD CONSTRAINT fk_ChuyenXe_Xe FOREIGN KEY (MaXe) REFERENCES Xe(MaXe)
+GO
+
+-------------------------------------------------------------------------b
+
+INSERT INTO XE (MaXe , BienSoXe , HangSanXuat , TongSoGhe )
+VALUES ('X001', '78H-2532', N'HYUNDAI', 4 ),
+       ('X002', '79H-2632', N' TOYOTA', 7),
+	   ('X003', '47H-2652', N' MITSUBI', 6),
+	   ('X004', '43H-2352', N' FORD', 5),
+	   ('X005', '21H-2852', N' FORD' ,7)
+GO
+
+INSERT INTO TAIXE ( MaTaiXe , HoDemTX , TenTX , NgaySinh  )
+VALUES 
+('TX01' , N'ĐÀO TUẤN ' , N'NGHĨA' , '16-10-2002' ),
+('TX02' , N'ĐÀO VĂN ' , N'TÙNG' , '6-10-1997' ),
+('TX03' , N'HUỲNH XUÂN ' , N'MẠNH' , '7-10-1999' ),
+('TX04' , N'DƯƠNG VĂN' , N'LÂM' , '1/5/2000' ),
+('TX05' , N'TÔ MINH ' , N'SƠN' , '7-8-1995' )
+GO
+
+INSERT INTO NoiDen (MaNoiDen,TenNoiDen,SoKm,GiaVe)
+VALUES ('SG',N'Sài Gòn','450',70000),
+		('HN',N'Hà Nội','1000',100000),
+		('BD',N'Bình Định','400',50000),
+		('QN',N'Quảnh Ninh','700',90000),
+		('TB',N'Bình Định','400',50000)
+GO
+
+INSERT INTO ChuyenXe (Ngay,MaXe,MaTaiXe,MaNoiDen,SoVe)
+VALUES ('21-05-2021','X001','TX01','SG',31),
+		('22-05-2018','X002','TX02','HN',23),
+		('23-06-2021','X003','TX03','BD',22),
+		('24-07-2018','X004','TX04','QN',15),
+		('25-08-2021','X005','TX05','TB',40)
+GO
+
+--------------------------------Câu 2---------------------------------------
+
+---------------------------------------------------------------------------a
+SELECT tx.MaTaiXe, HoDemTX + ' ' + TenTX as HoTen
+FROM TaiXe tx
+join ChuyenXe cx
+on tx.MaTaiXe = cx.MaTaiXe
+WHERE YEAR(cx.Ngay) = '2021' AND TenTX LIKE '%SƠN%'
+GO
+
+---------------------------------------------------------------------------b
+SELECT TenNoiDen, Sum(SoVe) as SoVeban, Sum(SoVe) * GiaVe as TongSoTien
+FROM ChuyenXe cx
+join NoiDen nd
+on cx.MaNoiDen = nd.MaNoiDen
+WHERE MONTH(cx.Ngay) = '5' AND YEAR(cx.Ngay) = '2021'
+Group by TenNoiDen, GiaVe
+GO
+
+----------------------------------------------------------------------------c
+SELECT TOP 1 x.MaXe, BienSoXe, Sum(SoKm) as TongKm
+FROM Xe x
+Join ChuyenXe cx
+on x.MaXe = cx.MaXe
+Join NoiDen nd
+on cx.MaNoiDen = nd.MaNoiDen
+WHERE YEAR(cx.Ngay) = '2021'
+GROUP BY x.MaXe, BienSoXe
+ORDER BY TongKm DESC
+GO
+
+------------------------------------------------------------------------------d
+SELECT cx.MaTaiXe, cx.MaNoiDen, Count(Ngay) as 'SoChuyenXe'
+FROM ChuyenXe cx
+WHERE YEAR(Ngay) = 2021
+GROUP BY cx.MaTaiXe, cx.MaNoiDen
+GO
+
+------------------------------------------------------------------------------e
+SELECT tx.MaTaiXe,Count(MaXe)
+as TongXe
+from TaiXe tx
+join ChuyenXe cx
+on tx.MaTaiXe = cx.MaTaiXe
+group by tx.MaTaiXe
+having Count(MaXe) in(
+select count(MaXe)
+from Xe)
+
+
+----------------------------------Câu 3------------------------------------------
+------------------------------------------------------------------------------a
+CREATE PROC sp_showtttaixe @MaTaiXe varchar(4)
+AS BEGIN
+  SELECT * 
+  FROM ChuyenXe cx
+  Join TaiXe tx
+  on cx.MaTaiXe = tx.MaTaiXe
+  WHERE tx.MaTaiXe = @MaTaiXe
+END
+GO
+
+sp_showtttaixe TX01
+GO
+
+-------------------------------------------------------------------------------b
+CREATE FUNCTION fn_tongsoluongcx2(@MaTaiXe varchar(4))
+RETURNS int
+AS
+BEGIN
+    DECLARE @sum int
+        SELECT @sum = Count(Ngay)
+        FROM TaiXe tx
+        JOIN ChuyenXe cx
+        ON tx.MaTaiXe = cx.MaTaiXe
+        WHERE YEAR(Ngay) = '2021' AND tx.MaTaiXe = @MaTaiXe
+        GROUP BY tx.MaTaiXe, HoDemTX, TenTX, NgaySinh
+    RETURN @sum
+END
+GO
+
+SELECT *, dbo.fn_tongsoluongcx2('TX01') as 'Tổng số chuyến xe' FROM TaiXe
+GO
+
+---------------------------------------------------------------------------------c
+CREATE TRIGGER trg_SoVeBan1 ON ChuyenXe
+FOR INSERT
+AS BEGIN
+
+  DECLARE @SoGhe int
+  SELECT @SoGhe = TongSoGhe From Xe x join inserted i on i.MaXe = x.MaXe
+  DECLARE @TongSoVe int
+  SELECT @TongSoVe = cx.SoVe From ChuyenXe cx join inserted i on i.MaXe = cx.Maxe group by cx.MaXe, cx.SoVe
+  PRINT @SoGhe
+  PRINT @TongSoVe
+  IF (@SoGhe < @TongSoVe) 
+  BEGIN
+    ROLLBACK
+    PRINT 'So Ve Da Vuot Tong So Ghe'
+  END
+END
+GO
+
+CREATE TRIGGER trg_SoVeBan2 ON ChuyenXe
+FOR UPDATE
+AS BEGIN
+  DECLARE @SoGhe int
+  SELECT @SoGhe = TongSoGhe From Xe x join deleted d on d.MaXe = x.MaXe
+  DECLARE @TongSoVe int
+  SELECT @TongSoVe = cx.SoVe From ChuyenXe cx join deleted d on d.MaXe = cx.Maxe group by cx.MaXe, cx.SoVe
+  PRINT @SoGhe
+  PRINT @TongSoVe
+  IF (@SoGhe < @TongSoVe) 
+  BEGIN
+    ROLLBACK
+    PRINT 'So Ve Da Vuot Tong So Ghe'
+  END
+END
+GO 

@@ -1,0 +1,111 @@
+CÂU 1:
+phần a)
+CREATE TABLE NHANVIEN
+(
+	MSNV VARCHAR(5) PRIMARY KEY,
+	HoTen NVARCHAR(20),
+	Gioitinh VARCHAR(5),
+	Diachi NVARCHAR(100),
+	Luong Money
+);
+CREATE TABLE KHACHHANG
+(
+	MSKH VARCHAR(5) PRIMARY KEY,
+	Holot nvarchar(20),
+	Ten nvarchar(10),
+	Diachi nvarchar(100)
+);
+CREATE TABLE VATTU
+(
+	MSVT VARCHAR(5) PRIMARY KEY,
+	TenVT NVARCHAR(20),
+	DVT NVARCHAR(10),
+	Dongia money
+);
+CREATE TABLE BANHANG
+(
+	SoHD VARCHAR(10),
+	MSKH VARCHAR(5),
+	MSVT VARCHAR(5),
+	Soluong INT,
+	Ngayban date,
+	MSNV VARCHAR(5),
+	primary key(SoHD,MSKH,MSVT)
+	constraint fk_banhang_nhanvien FOREIGN KEY (MSNV) REFERENCES NHANVIEN(MSNV),
+	CONSTRAINT fk_banhang1_vattu FOREIGN KEY (MSVT) REFERENCES VATTU(MSVT),
+	CONSTRAINT fk_banhang2_khanhhang FOREIGN KEY (MSKH) REFERENCES KHACHHANG(MSKH)
+);
+phần b)
+INSERT INTO  NHANVIEN
+VALUES  ('NV01',N'Trần Thái Thiên','Nam',N'18 Đinh Tiên Hoàng, Phú Đông',50000),
+		('NV02',N'Đinh Hữu Hoàng','Nam',N'12 Lý Tự Trọng, Nha Trang',90000),
+		('NV03',N'Võ Thị Thu Phương','Nu',N'15 Lý Tự Trọng, Sông Cầu',70000),
+		('NV04',N'Võ Minh Trí','Nam',N'123 Quan Liêu, Nha Trang',80000),
+		('NV05',N'Lê Kim Anh','Nu',N'771 Lê Thái Bình, Phú Đông',50000)
+INSERT INTO KHACHHANG
+VALUES	('00001',N'Trần Quang',N'Lộc','132 Thái Bình, Phú Yên'),
+		('00002',N'Trần Quang',N'Lực','132 Thái Bình, Phú Yên'),
+		('00003',N'Nguyễn Hồng',N'Đào','111 Kim Khai, Sông Cầu'),
+		('00004',N'Hồ Hoàng',N'Kim','132 Thái Bình, Phú Yên'),
+		('00005',N'Trần Quang',N'Lộc','132 Thái Bình, Phú Yên')
+INSERT INTO VATTU
+VALUES  ('VT01',N'Ti Vi',N'Cái',5000),
+		('VT02',N'Tủ Lạnh',N'Cái',3000),
+		('VT03',N'Nồi Cơm',N'Cái',2000),
+		('VT04',N'Máy Giặc',N'Cái',6000),
+		('VT05',N'Máy Lạnh',N'Cái',3000)
+INSERT INTO BANHANG
+VALUES  ('030604001','00001','VT01',50,'03/06/2019','NV01'),
+		('030604002','00002','VT04',85,'09/07/2020','NV01'),
+		('030604003','00004','VT02',100,'05/05/2018','NV01'),
+		('030604004','00005','VT03',60,'08/09/2019','NV01'),
+		('030604005','00003','VT05',45,'07/06/2019','NV01')
+
+câu 2:
+a) 
+select TenVT from VATTU where Dongia < 5000
+b)
+select kh.Holot,kh.Ten,kh.Diachi,vt.TenVT,bh.Soluong*vt.Dongia 'số tiền'
+from KHACHHANG kh
+join BANHANG bh
+on kh.MSKH=BH.MSKH
+join VATTU vt
+on vt.MSVT=bh.MSVT
+order by bh.Soluong*vt.Dongia ASC
+c) 
+select vt.Tenvt, bh.Soluong * vt.Dongia 'số tiền', month(Ngayban) thang
+from VATTU vt
+join BANHANG bh
+on vt.MSVT=bh.MSVT
+where year(Ngayban)=2018
+group by vt.Tenvt, bh.Soluong * vt.Dongia, month(Ngayban)
+d)
+select nv.MSNV,nv.HoTen,vt.TenVT,bh.Soluong 
+from NHANVIEN nv
+join BANHANG bh
+on nv.MSNV=bh.MSNV
+join VATTU vt
+on vt.MSVT=bh.MSVT
+order by bh.Soluong ASC
+e)
+update NHANVIEN
+set Luong = Luong + Luong/100*20
+where MSNV in
+(
+	select MSNV
+	from BANHANG
+	where Soluong >80 and year(Ngayban) = 2018
+)
+f)
+select vt.Tenvt
+from VATTU vt
+join BANHANG bh
+on vt.MSVT = bh.MSVT
+where Soluong is null and month(Ngayban) =7 and year(Ngayban) = 2020
+g)
+select nv.MSNV,nv.HoTen, max(bh.Soluong) as 'số lượng'
+from NHANVIEN nv
+join BANHANG bh
+on nv.MSNV = bh.MSNV
+where year(Ngayban)=2019
+group by nv.MSNV,nv.HoTen

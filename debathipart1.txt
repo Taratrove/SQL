@@ -1,0 +1,135 @@
+-------------------------------------------------------------------------
+câu 1:
+use master;
+drop database test;
+create database test;
+use test;
+CREATE TABLE nhanvien (
+Manv nVARCHAR(12) NOT NULL primary key ,
+Holot nvarchar(20) NULL,
+Ten nvarchar(12) NULL    ,
+Gioitinh nvarchar(12) NULL 
+
+);
+CREATE TABLE hanghoa (
+Mahh NVARCHAR(12) NOT NULL ,
+Tenhh NVARCHAR(20) NULL,
+Donvitinh NVARCHAR(10) NULL,
+Tenncc NVARCHAR(20) NULL
+PRIMARY KEY (Mahh)
+);
+CREATE TABLE hoadonnhap (
+Sohd NVARCHAR(12) NOT NULL ,
+Ngaynhap SMALLDATETIME NULL,
+Manv NVARCHAR(12) NULL
+PRIMARY KEY (Sohd)
+CONSTRAINT fk_hoadonnhap_nhanvien FOREIGN KEY (Manv) REFERENCES nhanvien(Manv)
+);
+CREATE TABLE cthdn (
+Sohd NVARCHAR(12) NOT NULL,
+Mahh NVARCHAR(12) NOT NULL ,
+Soluong VARCHAR(10) NULL,
+Dongianhap VARCHAR(10) NULL,
+PRIMARY KEY (Mahh,sohd),
+CONSTRAINT fk_cthdn_hoadonnhap FOREIGN KEY (Sohd) REFERENCES hoadonnhap(Sohd),
+CONSTRAINT fk_cthdn_hanghoa FOREIGN KEY (Mahh) REFERENCES hanghoa(Mahh)
+);
+INSERT INTO dbo.nhanvien
+(
+    Manv,
+    Holot,
+    Ten,
+    Gioitinh
+)
+VALUES
+(   'NV01', -- Manv - nvarchar(12)
+    'Tran', -- Holot - nvarchar(20)
+    'Mi', -- Ten - nvarchar(12)
+    'Nu'  -- Gioitinh - nvarchar(12)
+    ),
+    (   'NV02', -- Manv - nvarchar(12)
+    'Nguyen', -- Holot - nvarchar(20)
+    'Nguyen', -- Ten - nvarchar(12)
+    'Nam'  -- Gioitinh - nvarchar(12)
+    ),
+    (   'NV03', -- Manv - nvarchar(12)
+    'Tran', -- Holot - nvarchar(20)
+    'Tien', -- Ten - nvarchar(12)
+    'Nam'  -- Gioitinh - nvarchar(12)
+    ),
+    (   'NV04', -- Manv - nvarchar(12)
+    'Nguyen', -- Holot - nvarchar(20)
+    'Chau', -- Ten - nvarchar(12)
+    'Nam'  -- Gioitinh - nvarchar(12)
+    ),
+    (   'NV05', -- Manv - nvarchar(12)
+    'Dam', -- Holot - nvarchar(20)
+    'Ngan', -- Ten - nvarchar(12)
+    'Nu'  -- Gioitinh - nvarchar(12)
+    )
+    SELECT *FROM dbo.nhanvien
+    INSERT INTO dbo.hanghoa
+    (
+        Mahh,
+        Tenhh,
+        Donvitinh,
+        Tenncc
+    )
+    VALUES
+    (   'H001', -- Mahh - nvarchar(12)
+        'Cam', -- Tenhh - nvarchar(20)
+        'Thùng', -- Donvitinh - nvarchar(10)
+        ''  -- Tenncc - nvarchar(20)
+        )
+
+alter table cthdn
+	alter column Dongianhap int
+---------------------------------------------------------------------
+câu b:
+select top 2 max(Soluong),hh.Tenhh, hn.Sohd, ct.Soluong
+from hanghoa hh
+join cthdn ct
+on hh.Mahh=ct.Mahh
+join hoadonnhap hn
+on ct.Sohd=hn.Sohd
+group by hh.Tenhh, hn.Sohd, ct.Soluong
+----------------------------------------------------------------------
+câu c:
+select hh.Tenncc ,sum(ct.Dongianhap) 'số tiền'
+from hanghoa hh
+join cthdn ct
+on hh.Mahh=ct.Mahh
+join hoadonnhap hn
+on hn.Sohd=ct.Sohd
+where YEAR(Ngaynhap)=2021
+group by hh.Tenncc
+-----------------------------------------------------------------------
+câu e:
+update cthdn 
+set Dongianhap = Dongianhap - Dongianhap/100*20
+where sohd in (
+select sohd
+from hoadonnhap
+where day(Ngaynhap)= 24 and MONTH(Ngaynhap)= 7 and YEAR(Ngaynhap)= 2022
+)
+------------------------------------------------------------------------
+câu f:
+select max(ct.Soluong) 'Số lượng' , nv.Holot, nv.Ten
+from nhanvien nv
+join hoadonnhap hd
+on nv.Manv = hd.Manv
+join cthdn ct
+on hd.Sohd=ct.Sohd
+where year(Ngaynhap) = 2021
+group by nv.Holot,nv.Ten
+------------------------------------------------------------------------
+câu g:
+select hh.Mahh, hh.Tenhh, nv.Ten, nv.Manv
+from hanghoa hh
+join cthdn ct
+on hh.Mahh=ct.Mahh
+join hoadonnhap hd
+on hd.Sohd=ct.Sohd
+join nhanvien nv
+on nv.Manv=hd.Manv
+where nv.Manv like 'NV01' and month(hd.Ngaynhap)= 7 and YEAR(hd.Ngaynhap)= 2021

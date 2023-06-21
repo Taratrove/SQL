@@ -1,0 +1,91 @@
+câu 1:
+	
+create database QuanLyLaiXe_62130312
+ON PRIMARY
+(
+    Name = QuanLyLaiXe_data
+    ,FileName = "c:\SQLSever_62130312_data.mdf"
+    ,Size = 20MB
+    ,MaxSize = 40MB
+    ,FileGrowth = 1MB
+)
+LOG ON
+(
+    Name = QuanLyLaiXe_log
+    ,FileName = "c:\SQLSever_62130312_Log.ldf"
+    ,Size = 6MB
+    ,MaxSize = 8MB
+    ,FileGrowth = 1MB
+);
+câu 2:
+use master;
+	create login Admin_62130312 for password+ '123',
+	grant connect sql to Admin 12345;
+use QuanLyLaiXe_62130312
+	create user Admin_62130312 user12345 for login 	Admin_62130312_12345;
+	grant create select to Admin_62130312_user12345;
+	grant create insert to Admin_62130312_user12345;
+	grant create update to Admin_62130312_user12345;
+exec as login = 'Admin_62130312_12345';
+
+câu 3:
+create table LaiXe(
+	MaLX nvarchar(9) not null primary key,
+	Ho nvarchar(40) null,
+	Ten nvarchar(10) null,
+	Gioitinh varchar(2) null,
+	NgaySinh smalldatetime null,
+	DiaChi nvarchar(20) null,
+	STD numeric(18,0) null,
+);
+
+create table Xe(
+	MaXe nvarchar(12) not null primary key,
+	LoaiXe nvarchar(40) null,
+	TaiTrong varchar(10) null,
+	TGKD smalldatetime null,
+	PhiVC varchar(15) null,
+);
+
+create table VanTai(
+	MaLX nvarchar(9) not null,
+	MaXe nvarchar(12) not null,
+	NgayVC smalldatetime not null,
+	SoKm varchar(50) null,
+	TrongLuong varchar(20) null,
+	constraint VanTai_pk primary key (MaLX,MaXe,NgayVC),
+);
+
+alter table VanTai
+	add constraint  fk_vantai_laixe foreign key (MaLX) references LaiXe(MaLX)
+	add constraint  fk_vantai1_laixe1 foreign key (MaXe) references Xe(MaXe)
+
+alter table LaiXe
+	insert into LaiXe(MaLX, Ho, Ten, Gioitinh, NgaySinh, DiaChi, STD)
+	values(CN01, Nguyễn Thị, Ánh, nữ, 2/5/1997, Cam Ranh, 09845648)
+	insert into LaiXe(MaLX, Ho, Ten, Gioitinh, NgaySinh, DiaChi, STD)
+	values(CN02, Trần Đức, Cường, nam, 6/1/1995, Ninh Hoà, 03454984)
+	insert into LaiXe(MaLX, Ho, Ten, Gioitinh, NgaySinh, DiaChi, STD)
+	values(LT01, Nguyễn 
+câu 4:
+select Ten, Year(getdate())-Year(NGSINH) as 'Tuổi', Gioitinh
+from LaiXe 
+where Gioitinh like N'nữ' and Year(getdate())-year(NgaySinh) > 25
+câu 5:
+select  nv1.Ho, nv1.Ten, nv2.Ho, nv2.Ten
+from LaiXe nv1
+join LaiXe nv2
+on nv1.Ten <> nv2.Ten
+where (nv1.NgaySinh = nv2.NgaySinh)
+
+câu 6:
+select 
+from 
+
+câu7:
+select nv.MaLX, nv.Ten, nv.STD
+from LaiXe nv
+join VanTai kl
+on nv.MaLX = kl.MaLX
+where SoKm> 10000 and year(NgayVC) = 2022
+

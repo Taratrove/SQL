@@ -1,0 +1,33 @@
+câu1:
+use QuanLyDeAn;
+CREATE LOGIN QLDA_62130312
+WITH PASSWORD = 'ADMIN';
+
+ALTER AUTHORIZATION
+ON DATABASE::QuanLyDeAn To QLDA_62130312;
+
+EXEC AS LOGIN = 'QLDA_62130312';
+
+grant CREATE VIEW, CREATE TABLE, SELECT, INSERT, UPDATE 
+on database::QuanLyDeAn
+to QLDA_62132235;
+
+câu 2:
+select HONV+ ' ' +TENLOT+ ' ' +TENNV as 'Họ Và Tên',year(getdate())-year(NGSINH) as 'tuổi'
+	from NhanVien 
+	where NhanVien.PHAI like N'nữ' and(year(getdate())-year(NGSINH) between 25 and 40)
+	select *
+	from NhanVien
+câu 4:
+select PhongBan.TENPHG, NhanVien.TENNV, NhanVien.LUONG
+from PhongBan,NhanVien
+where TENPHG ='thiết kế' and LUONG = LUONG 
+Câu 5:
+select PhongBan.TENPHG, NhanVien.TENNV, Phancong.THOIGIAN
+from PhongBan, NhanVien, Phancong
+where TENPHG ='thiết kế' and THOIGIAN > 6
+câu 6:
+ select TENDA, count(*)
+    from PhanCong,NhanVien
+    where TENNV=MANV
+    group by MADA

@@ -1,0 +1,117 @@
+use Quanlydean
+go
+-------------------------------------câu1--------------------------------------
+create proc sp_hienthithongtin1 (@maphg varchar(30))
+as begin
+	select  nv.HONV +''+ nv.TENLOT +''+ nv.TENNV, nv.DCHI
+	from NHANVIEN nv
+	join PHONGBAN pb
+	on pb.MAPHG = nv.PHG 
+	where pb.MAPHG = @maphg
+end 
+go
+exec sp_hienthithongtin1 1
+-------------------------------------câu2---------------------------------------
+create proc sp_tongthunhap(
+@manv varchar(30)
+)
+as begin
+
+	declare @tennv nvarchar(30),
+			@tenda nvarchar(30),
+			@tongthunhap money
+	declare curr cursor read_only fast_forward for
+		select HONV + '' + TENLOT + '' + TENNV as 'tên nhân viên',da.TENDA, sum(nv.LUONG * pc.THOIGIAN) as 'tổng thu nhập'
+		from NHANVIEN nv
+		join PHANCONG pc
+		on nv.MANV=pc.MA_NVIEN
+		join DEAN da
+		on pc.SODA = da.TENDA
+		where MANV = @manv
+		group by MANV,HONV,TENLOT,TENNV,TENDA
+	open curr
+	fetch next from curr into @manv,@tennv,@tenda,@tongthunhap
+	while @@FETCH_STATUS =0
+	begin
+		print ('==================');
+		print (N'tên nhân viên:' + @tennv);
+		print(N'tên đề án:' + @tenda);
+		print (N'tổng thu nhập:' + convert(varchar(30), @tongthunhap));
+		fetch next from curr into @tennv,@tenda,@tongthunhap
+	end
+	close curr
+	deallocate curr
+end
+go
+exec sp_tongthunhap 1
+------------------------------câu3-------------------------------------------
+create function fn_tangluongdk (
+@manv varchar(30))
+returns money
+as begin
+	declare @luong money
+	declare @gt nvarchar(3)
+	select @luong = LUONG, @gt = PHAI
+	from NHANVIEN nv
+	where MANV = @manv
+
+	if(@gt =N'nữ')
+	begin 
+		set @luong = @luong + (@luong /100*5)
+	end
+
+return @luong
+end
+gocreate function fn_tangluongdk (
+@manv varchar(30))
+returns money
+as begin
+	declare @luong money
+	declare @gt nvarchar(3)
+	select @luong = LUONG, @gt = PHAI
+	from NHANVIEN nv
+	where MANV = @manv
+
+	if(@gt =N'nữ')
+	begin 
+		set @luong = @luong + (@luong /100*5)
+	end
+
+return @luong
+end
+go
+----------------------------------câu4----------------------------------------
+CREATE FUNCTION dbo.fn_TongtienLuong (@maphg varchar(30))
+RETURNS Int
+AS
+BEGIN
+DECLARE @Tong INT 
+SELECT @tong = AVG(nv.LUONG)
+FROM dbo.PhongBan pb
+JOIN dbo.NhanVien nv
+ON nv.MANV = pb.TRPHG 
+group by MAPHG,TENPHG
+having @maphg = pb.MAPHG 
+RETURN @Tong
+END
+go
+select dbo.fn_TongtienLuong(MAPHG) from PHONGBAN
+go
+-----------------------------------câu5----------------------------------
+CREATE OR ALTER TRIGGER Suathoigian
+ON Phancong 
+FOR INSERT,UPDATE
+AS 
+BEGIN 
+    DECLARE @thoigian NUMERIC(18,0)
+    SELECT @thoigian = thoigian FROM inserted 
+    IF (@thoigian < 1)
+    BEGIN
+    PRINT N'Khong cho phep them thoi gian'
+    END
+
+    IF (@thoigian > 12)
+    BEGIN
+    PRINT N'Khong cho phep sua thoi gian' 
+    END
+END

@@ -1,0 +1,106 @@
+Cau 1:
+a.
+CREATE DATABASE QuanLyDeAn
+ON PRIMARY
+(
+    Name = QuanLyDeAn_data1
+    ,FileName = "D:\NguyenTrongTin\QuanLyDeAn_data.mdf"
+    ,Size = 20MB
+    ,MaxSize = 40MB
+    ,FileGrowth = 1MB
+)
+LOG ON
+(
+    Name = QuanLyDeAn_log
+    ,FileName = "D:\NguyenTrongTin\QuanLyDeAn_Log.ldf"
+    ,Size = 6MB
+    ,MaxSize = 8MB
+    ,FileGrowth = 1MB
+);
+
+b.
+sp_helpDB QuanLyDeAn;
+sp_spaceused QuanLyDeAn;
+
+c.
+Alter DATABASE QuanLyDeAn ADD FILEGROUP QuanLyDeAn;
+
+d.
+ALTER DATABASE QuanLyDeAn
+ADD FILE
+(
+    Name = "QuanLyDeAn_data2"
+    ,FileName = "D:\NguyenTrongTin\QuanLyDeAn_data2.ndf"
+) TO FILEGROUP QuanLyDeAn;
+
+f.
+ALTER DATABASE QuanLyDeAn Set Read_Only;
+ALTER DATABASE QuanLyDeAn Set READ_WRITE;
+sp_helpDB QuanLyDeAn;
+
+g.
+ALTER DATABASE QuanLyDeAn MODIFY FILE
+(
+    Name = QuanLyDeAn_data1
+    ,Size = 50MB
+);
+ALTER DATABASE QuanLyDeAn MODIFY FILE
+(
+    Name = QuanLyDeAn_log
+    ,Size = 10MB
+);
+
+
+Cau 2:
+Create Table NhanVien(
+MANV VARCHAR(9) NOT NULL, 
+HONV nvarchar (15) NULL,
+TENLOT nvarchar(30) NULL,
+TENNV  nvarchar(30) NUll,
+NGSINH smalldatetime NULL,
+DCHI  nvarchar(150) NULL,
+PHAI  nvarchar(3) NULL,
+LUONG numeric(18,0) NULL,
+MA_NQL varchar(9) NULL,
+PHG  varchar(2),
+Constraint NhanVien_pk Primary Key (MANV),
+Constraint NhanVien_fk Foreign Key (MA_NQL) references Nhanvien(MANV)
+);
+Create Table Dean(
+MADA varchar(2) NOT NULL,
+TENDA nvarchar(50) NULL,
+DDIEM_DA varchar(20) NULL,
+Phong varchar(2) NULL,
+Constraint Dean_pk Primary Key (MADA)
+);
+Create Table Phancong(
+MA_NVien varchar(9) NOT NULL,
+SODA varchar(2) NOT NULL,
+THOIGIAN numeric(18,0) NULL,
+Constraint Phancong_pk Primary Key (MA_NVIEN,SODA),
+Constraint fk_Phancong_Nhanvien Foreign Key (MA_NVien) References Nhanvien(MANV),
+Constraint fk_Phancong_Nhanvien2 Foreign Key (SODA) References Dean (MADA)
+);
+Create Table PhongBan(
+MAPHG varchar(2) NOT NULL,
+TENPHG nvarchar(20) NULL,
+TRPHG varchar(9) NULL,
+NG_NHANC smalldatetime NULL,
+Constraint PhongBan_pk Primary Key(MAPHG),
+Constraint fk_PhongBan_Nhanvien Foreign Key (TRPHG) References Nhanvien(MANV)
+);
+Create Table ThanNhan(
+MA_NVien varchar(9) NOT NULL,
+TENTN varchar(20) NOT NULL,
+NGSINH smalldatetime NULL,
+PHAI varchar(3) NULL,
+QUANHE varchar(15) NULL,
+Constraint ThanNhan_pk Primary Key(MA_NVIEN,TENTN),
+Constraint fp_ThanNhan_Nhanvien foreign KEy (MA_NVien) References NhanVien(MANV)
+);
+CREATE TABLE DIADIEM_PHG(
+MAPHG varchar(2) NOT NULL,
+DIADIEM varchar(20) NOT NULL,
+CONSTRAINT DIADIEMPHG_pk Primary Key(MAPHG,DIADIEM),
+CONSTRAINT fk_DIEMDIEMPHG_PhongBan foreign KEY(MAPHG) references PhongBan(MAPHG)
+);
